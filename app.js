@@ -4,7 +4,17 @@ const mongoose = require("mongoose");
 const routes = require("./routing");
 
 const app = express();
+
+// Enable CORS
+app.use(cors({
+  origin: "*", // allow all origins (for testing)
+}));
+
+
+
 app.use(express.json());
+
+
 
 app.get("/health", (req, res) => {
   res.status(200).json({
