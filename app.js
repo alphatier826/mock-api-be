@@ -6,6 +6,13 @@ const routes = require("./routing");
 const app = express();
 app.use(express.json());
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Service up and running"
+  });
+});
+
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error("MongoDB error:", err));
