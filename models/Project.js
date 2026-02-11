@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema(
   {
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true
+    },
     name: {
       type: String,
       required: true,
@@ -10,7 +16,6 @@ const projectSchema = new mongoose.Schema(
     slug: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
       lowercase: true
     },
@@ -31,9 +36,10 @@ const projectSchema = new mongoose.Schema(
       default: 0
     }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
+
+// unique slug per user
+projectSchema.index({ user_id: 1, slug: 1 }, { unique: true });
 
 module.exports = mongoose.model("Project", projectSchema);

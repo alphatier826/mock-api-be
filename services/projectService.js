@@ -9,7 +9,11 @@ exports.createProject = async (data) => {
     const project = new Project(data);
     const savedProject = await project.save();
 
-    logger.info("Service: Project created", { id: savedProject._id });
+    logger.info("Service: Project created", {
+      id: savedProject._id,
+      userId: savedProject.user_id
+    });
+
     return savedProject;
   } catch (err) {
     logger.error("Service: Create project failed", err);
@@ -17,14 +21,19 @@ exports.createProject = async (data) => {
   }
 };
 
-// Get all projects
-exports.getAllProjects = async () => {
+// Get all projects for user
+exports.getAllProjects = async (userId) => {
   try {
-    logger.info("Service: Fetching all projects");
+    logger.info("Service: Fetching projects", { userId });
 
-    const projects = await Project.find().sort({ createdAt: -1 });
+    const projects = await Project.find({ user_id: userId })
+      .sort({ createdAt: -1 });
 
-    logger.info("Service: Projects fetched", { count: projects.length });
+    logger.info("Service: Projects fetched", {
+      userId,
+      count: projects.length
+    });
+
     return projects;
   } catch (err) {
     logger.error("Service: Get all projects failed", err);
@@ -32,15 +41,18 @@ exports.getAllProjects = async () => {
   }
 };
 
-// Get project by ID
-exports.getProjectById = async (id) => {
+// Get project by id (user scoped)
+exports.getProjectById = async (id, userId) => {
   try {
-    logger.info("Service: Fetching project by id", { id });
+    logger.info("Service: Fetching project by id", { id, userId });
 
-    const project = await Project.findById(id);
+    const project = await Project.findOne({
+      _id: id,
+      user_id: userId
+    });
 
     if (!project) {
-      logger.warn("Service: Project not found", { id });
+      logger.warn("Service: Project not found", { id, userId });
     }
 
     return project;
@@ -50,20 +62,24 @@ exports.getProjectById = async (id) => {
   }
 };
 
-// Update project
-exports.updateProject = async (id, data) => {
+// Update project (user scoped)
+exports.updateProject = async (id, data, userId) => {
   try {
-    logger.info("Service: Updating project", { id, data });
+    logger.info("Service: Updating project", { id, userId, data });
 
-    const project = await Project.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true
-    });
+    const project = await Project.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      data,
+      { new: true, runValidators: true }
+    );
 
     if (!project) {
-      logger.warn("Service: Project not found for update", { id });
+      logger.warn("Service: Project not found for update", {
+        id,
+        userId
+      });
     } else {
-      logger.info("Service: Project updated", { id });
+      logger.info("Service: Project updated", { id, userId });
     }
 
     return project;
@@ -73,17 +89,23 @@ exports.updateProject = async (id, data) => {
   }
 };
 
-// Delete project
-exports.deleteProject = async (id) => {
+// Delete project (user scoped)
+exports.deleteProject = async (id, userId) => {
   try {
-    logger.info("Service: Deleting project", { id });
+    logger.info("Service: Deleting project", { id, userId });
 
-    const project = await Project.findByIdAndDelete(id);
+    const project = await Project.findOneAndDelete({
+      _id: id,
+      user_id: userId
+    });
 
     if (!project) {
-      logger.warn("Service: Project not found for delete", { id });
+      logger.warn("Service: Project not found for delete", {
+        id,
+        userId
+      });
     } else {
-      logger.info("Service: Project deleted", { id });
+      logger.info("Service: Project deleted", { id, userId });
     }
 
     return project;
