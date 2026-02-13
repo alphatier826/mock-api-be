@@ -5,6 +5,18 @@ exports.createEndpoint = async (data) => {
   return await Endpoint.create(data);
 };
 
+exports.bulkCreate = async (endpoints) => {
+    if (!Array.isArray(endpoints) || endpoints.length === 0) {
+      throw new Error("Endpoints array is required");
+    }
+    // insertMany is efficient for bulk operations
+    const createdEndpoints = await Endpoint.insertMany(endpoints, {
+      ordered: true, // stops on first error
+    });
+
+    return createdEndpoints;
+  }
+
 // Get all endpoints
 exports.getAllEndpoints = async () => {
   return await Endpoint.find().sort({ createdAt: -1 });

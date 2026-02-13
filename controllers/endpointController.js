@@ -22,6 +22,26 @@ exports.createEndpoint = async (req, res) => {
   }
 };
 
+exports.bulkCreate = async (req, res) => {
+  try {
+    logger.info("Creating bulkCreate endpoint", { body: req.body });
+
+    const endpoint = await endpointService.bulkCreate(req.body);
+    res.status(201).json(endpoint);
+
+    logger.info("Endpoint bulkCreate created", { id: endpoint._id });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        message: "bulkCreate Endpoint with this method and path already exists in this project"
+      });
+    }
+
+    logger.error("Create endpoint failed", err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
 // Get all endpoints
 exports.getAllEndpoints = async (req, res) => {
   try {

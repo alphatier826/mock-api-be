@@ -7,6 +7,8 @@ const authMiddleware = require("./middlewares/authMiddleware");
 const authController = require("./controllers/authController");
 const projectController = require("./controllers/projectController");
 const endpointController = require("./controllers/endpointController");
+const llmController = require("./controllers/llmController");
+
 
 
 // Public routes
@@ -22,11 +24,15 @@ router.delete("/projects/:id", authMiddleware, projectController.deleteProject);
 
 // Protected endpoint routes
 router.post("/endpoints", authMiddleware, endpointController.createEndpoint);
+router.post("/endpointBulkCreate", authMiddleware, endpointController.bulkCreate);
 router.get("/endpoints", authMiddleware, endpointController.getAllEndpoints);
 router.get("/endpoints/project/:projectId", authMiddleware, endpointController.getEndpointsByProject);
 router.get("/endpoints/:id", authMiddleware, endpointController.getEndpointById);
 router.put("/endpoints/:id", authMiddleware, endpointController.updateEndpoint);
 router.delete("/endpoints/:id", authMiddleware, endpointController.deleteEndpoint);
+
+router.post("/invoke-llm", authMiddleware, llmController.invokeLLM);
+
 
 
 module.exports = router;
